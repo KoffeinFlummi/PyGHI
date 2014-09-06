@@ -10,7 +10,7 @@ def randomstring(size=6, chars=string.ascii_uppercase + string.digits):
     # SOURCE: http://stackoverflow.com/a/2257449/3497501
     return ''.join(random.choice(chars) for _ in range(size))
 
-writeaccess = True if len(sys.argv) < 2 else bool(sys.argv[1])
+writeaccess = True if len(sys.argv) < 2 else "True" == sys.argv[1]
 
 testargs = [
     ["pyghi", "list"],
