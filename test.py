@@ -35,7 +35,7 @@ for i in range(len(testargs)):
     print("Testing %i/%i: %s ..." % (i, total, name), end=" ")
 
     try:
-        assert(subprocess.call(testarg, stdout=subprocess.PIPE) == 0)
+        subprocess.check_call(testarg, stdout=subprocess.PIPE)
     except:
         raise
         print("FAILED.")
