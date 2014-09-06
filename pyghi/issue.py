@@ -18,49 +18,32 @@ class Issue:
     if self.assignee != None:
       self.assignee = User(self.master, self.assignee)
 
-    if not "pull_request" in data:
-      self.pull_request = None
-      self.is_pr = False
-    else:
-      self.is_pr = True
-
-    self.comments = []
-    for comment in comments:
-      self.comments.append(Comment(self.master, comment))
+    self.is_pr = "pull_request" in data
 
     if self.milestone != None:
       self.milestone = Milestone(self.master, self.milestone)
-
-    self.labels = []
-    for label in data["labels"]:
-      self.labels.append(Label(self.master, label))
+    self.comments = list(map(lambda x: Comment(self.master, x), comments))
+    self.labels = list(map(lambda x: Label(self.master, x), self.labels))
 
   def print_line(self, shortlabels=False, nolabels=False, nocomments=False):
     number = stylize(("#" + str(self.number)).rjust(6), bold=True) + " "
 
-    if self.state == "open":
-      state = stylize(" O ", bg=0x00AA00) + " "
-    else:
-      state = stylize(" C ", bg=0xDD0000) + " "
+    state = stylize(" O ", bg=0x00AA00) if self.state == "open" else stylize(" C ", bg=0xDD0000)
+    state += " "
 
-    if self.pull_request != None:
-      issuetype = stylize(" P ", bg=0xCC00CC) + " "
-    else:
-      issuetype = ""
+    issuetype = stylize(" P ", bg=0xCC00CC) + " " if self.is_pr else ""
     
     name = self.title + " "
     
+    labels = ""
     if not nolabels:
       if shortlabels:
         labels = " ".join(list(map(lambda x: stylize(" ", bg=int(x.color, 16)), self.labels))) + " "
       else:
         labels = " ".join(list(map(lambda x: x.print_name(), self.labels))) + " "
-    else:
-      labels = ""
 
-    if nocomments:
-      comments = ""
-    else:
+    comments = ""
+    if not nocomments:
       comments = "[%i %s]" % (len(self.comments), stylize("@", fg=0xFFFF00))
 
     return "%s%s%s%s%s%s\n" % (number, state, issuetype, name, labels, comments)
@@ -73,21 +56,12 @@ class Issue:
       output += stylize(" Closed ", bg=0xAA0000, bold=True) + " "
     output += "%s created this %s\n" % (self.user.print_name(), relative_time(self.created_at))
 
-    if self.milestone != None:
-      milestone = self.milestone.progress_bar()
-    else:
-      milestone = "No milestone"
-
-    if self.assignee != None:
-      assignee = "Assigned to %s" % (self.assignee.print_name())
-    else:
-      assignee = "No assignee"
-
+    milestone = "No milestone" if self.milestone == None else self.milestone.progress_bar()
+    assignee = "Assigned to %s" % (self.assignee.print_name()) if self.assignee != None else "No assignee"
     output += "%s - %s\n" % (milestone, assignee)
 
-    if len(self.labels) > 0:
-      labels = " ".join(list(map(lambda x: x.print_name(), self.labels)))
-    else:
+    labels = " ".join(list(map(lambda x: x.print_name(), self.labels)))
+    if len(self.labels) == 0:
       labels = "No labels"
     output += labels + "\n\n"
 

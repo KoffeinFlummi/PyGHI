@@ -42,18 +42,16 @@ def stylize(text, fg=None, bg=None, bold=False):
     fg = 0x000000 if brightness > 0.5 else 0xFFFFFF
 
   if platform.system() == "Windows":
-    if bg != None:
-      fg_ansi, fg_reset = _rgb_to_ansi(fg)
-      bg_ansi, bg_reset = _rgb_to_ansi(bg, True)
-      return bg_ansi + fg_ansi + text + fg_reset + bg_reset
     if fg != None:
       fg_ansi, fg_reset = _rgb_to_ansi(fg)
+      if bg != None:
+        bg_ansi, bg_reset = _rgb_to_ansi(bg, True)
+        return bg_ansi + fg_ansi + text + fg_reset + bg_reset
       return fg_ansi + text + fg_reset
   else:
-    if bg != None:
-      return xtermcolor.colorize(text, rgb=fg, bg=bg)
-    if fg != None:
-      return xtermcolor.colorize(text, rgb=fg)
+    args = {"rgb": fg, "bg": bg} if bg != None else {"rgb": fg}
+    return xtermcolor.colorize(text, **args)
+
   return text
 
 # SOURCE: https://mail.python.org/pipermail/python-list/2008-December/482381.html
@@ -144,7 +142,7 @@ def relative_time(timestring):
 
 # SOURCE OF THE FOLLOWING 4 FUNCTIONS:
 # https://gist.github.com/jtriley/1108174
-# Edited for Python 3 compatibility
+# Edited by KoffeinFlummi
 
 def get_terminal_size():
   """ getTerminalSize()
@@ -157,14 +155,10 @@ def get_terminal_size():
   tuple_xy = None
   if current_os == 'Windows':
     tuple_xy = _get_terminal_size_windows()
-    if tuple_xy is None:
-      tuple_xy = _get_terminal_size_tput()
-      # needed for window's python in cygwin's xterm!
+    return tuple_xy if tuple_xy != None else _get_terminal_size_tput()
   if current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
-    tuple_xy = _get_terminal_size_linux()
-  if tuple_xy is None:
-    tuple_xy = (80, 25)      # default value
-  return tuple_xy
+    return _get_terminal_size_linux()
+  return (80, 25)
 
 def _get_terminal_size_windows():
   try:

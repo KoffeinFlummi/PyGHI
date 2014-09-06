@@ -18,6 +18,7 @@ from .label import Label
 from .milestone import Milestone
 
 from .helpers import *
+from .arguments import add_arguments
 from .stopwords import stopwords
 
 class PyGHI:
@@ -30,10 +31,7 @@ class PyGHI:
     self.stopwords = stopwords()
 
     # Load config
-    if platform.system() == "Windows":
-      configpath = os.path.join(os.environ["HOMEPATH"], ".pyghiconf")
-    else:
-      configpath = os.path.join(os.environ["HOME"], ".pyghiconf")
+    configpath = os.path.join(os.environ["HOMEPATH" if platform.system() == "Windows" else "HOME"], ".pyghiconf")
 
     self.config = {}
     if os.path.exists(configpath):
@@ -57,84 +55,7 @@ class PyGHI:
       self.log(2, "Couldn't extract GitHub URL.")
 
     # Parse Arguments
-    self.parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=20))
-    subparsers = self.parser.add_subparsers()
-
-    parser_list = subparsers.add_parser("list", formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=50))
-    parser_list_state = parser_list.add_mutually_exclusive_group()
-    parser_list_state.add_argument("-s", "--state", type=str, choices=["open", "closed", "all"], metavar="STATE", default="open", help="show issues of this state")
-    parser_list_state.add_argument("--closed", dest="state", action="store_const", const="closed", help="show closed issues")
-    parser_list_state.add_argument("--all", dest="state", action="store_const", const="all", help="show both closed and open issues")
-    parser_list.add_argument("-m", "--milestone", type=int, help="show issues with this milestone ID")
-    parser_list.add_argument("-l", "--labels", type=str, help="show issues with these labels (comma-seperated list)")
-    parser_list_labels = parser_list.add_mutually_exclusive_group()
-    parser_list_labels.add_argument("-a", "--assignee", type=str, help="show issues assigned to this user")
-    if "username" in self.config:
-      parser_list_labels.add_argument("--mine", dest="assignee", action="store_const", const=self.config["username"], help="show issues assigned to you")
-    parser_list_labels.add_argument("--noassignee", dest="assignee", action="store_const", const="none", help="show issues assigned to noone")
-    parser_list.add_argument("-c", "--creator", type=str, help="show issues created by this user")
-    parser_list_type = parser_list.add_mutually_exclusive_group()
-    parser_list_type.add_argument("-t", "--type", type=str, help="show issues of this type")
-    parser_list_type.add_argument("--issues", dest="type", action="store_const", const="issues", help="show only issues (no PRs)")
-    parser_list_type.add_argument("--prs", dest="type", action="store_const", const="prs", help="show only PRs (no issues)")
-    parser_list.add_argument("--duplicates", action="store_true", help="detect potential duplicates")
-    parser_list_lprint = parser_list.add_mutually_exclusive_group()
-    parser_list_lprint.add_argument("--nolabels", action="store_true", help="don't print labels")
-    parser_list_lprint.add_argument("--shortlabels", action="store_true", help="print a short version of labels")
-    parser_list.add_argument("--nocomments", action="store_true", help="don't print comment count")
-    parser_list.set_defaults(func=self.list)
-
-    parser_show = subparsers.add_parser("show")
-    parser_show.add_argument("issueid", type=int)
-    parser_show.add_argument("-b", "--browser", action="store_true", default=False)
-    parser_show.set_defaults(func=self.show)
-
-    parser_edit = subparsers.add_parser("edit")
-    parser_edit.add_argument("issueid", type=int)
-    parser_edit.add_argument("-t", "--title", type=str)
-    parser_edit.add_argument("-b", "--body", type=str)
-    parser_edit.add_argument("-a", "--assignee", type=str)
-    parser_edit.add_argument("-s", "--state", type=str, choices=["open", "closed"], metavar="STATE")
-    parser_edit.add_argument("-m", "--milestone", type=int)
-    parser_edit.add_argument("-l", "--labels", type=str)
-    parser_edit.set_defaults(func=self.edit)
-
-    parser_open = subparsers.add_parser("open")
-    parser_open.add_argument("issueid", type=int)
-    parser_open.set_defaults(func=self.open)
-
-    parser_close = subparsers.add_parser("close")
-    parser_close.add_argument("issueid", type=int)
-    parser_close.set_defaults(func=self.close)
-
-    parser_assign = subparsers.add_parser("assign")
-    parser_assign.add_argument("issueid", type=int)
-    parser_assign.add_argument("assignee", nargs="?", type=str, default="")
-    parser_assign_assignee = parser_assign.add_mutually_exclusive_group()
-    parser_assign_assignee.add_argument("--none", dest="assignee", action="store_const", const="")
-    if "username" in self.config:
-      parser_assign_assignee.add_argument("--me", dest="assignee", action="store_const", const=self.config["username"])
-    parser_assign.set_defaults(func=self.assign)
-
-    parser_create = subparsers.add_parser("create")
-    parser_create.add_argument("title", type=str)
-    parser_create.add_argument("body", type=str, nargs="?", default="")
-    parser_create.set_defaults(func=self.create)
-
-    parser_comment = subparsers.add_parser("comment")
-    parser_comment.add_argument("issueid", type=int)
-    parser_comment.add_argument("comment", type=str)
-    parser_comment.set_defaults(func=self.comment)
-
-    parser_milestone = subparsers.add_parser("milestone")
-    parser_milestone_state = parser_milestone.add_mutually_exclusive_group()
-    parser_milestone_state.add_argument("-s", "--state", type=str, choices=["open", "closed", "all"], metavar="STATE", default="open")
-    parser_milestone_state.add_argument("--closed", dest="state", action="store_const", const="closed")
-    parser_milestone_state.add_argument("--all", dest="state", action="store_const", const="all")
-    parser_milestone.set_defaults(func=self.milestone)
-
-    parser_label = subparsers.add_parser("label")
-    parser_label.set_defaults(func=self.label)
+    add_arguments(self)
 
   def parse_args(self, args):
     if len(args) == 0:
@@ -222,23 +143,18 @@ class PyGHI:
     print(" "*cols, end="\r")
 
   def list(self, args):
-    params = {}
-    params["state"] = args.state
-    if args.milestone:
-      params["milestone"] = args.milestone
-    if args.labels:
-      params["labels"] = args.labels
-    if args.assignee:
-      params["assignee"] = args.assignee
-    if args.creator:
-      params["creator"] = args.creator
+    params = {
+      "state": args.state,
+      "milestone": args.milestone,
+      "labels": args.labels,
+      "assignee": args.assignee,
+      "creator": args.creator
+    }
+    payload = {k: v for k, v in payload.items() if v != None}
 
-    if params["state"] == "all":
-      heading = "All Issues for %s/%s" % (self.owner, self.repo)
-    elif params["state"] == "open":
-      heading = "Open Issues for %s/%s" % (self.owner, self.repo)
-    else:
-      heading = "Closed Issues for %s/%s" % (self.owner, self.repo)
+    headingstate = args.state[0].upper() + args.state[1:]
+    heading = "%s Issues for %s/%s:" % (headingstate, self.owner, self.repo)
+
     if "milestone" in params:
       heading += ", with milestone #%i" % (params["milestone"])
     if "labels" in params:
@@ -247,8 +163,8 @@ class PyGHI:
       heading += ", assigned to %s" % (params["assignee"])
     if "creator" in params:
       heading += ", created by %s" % (params["creator"])
-    heading += ":"
-    print(stylize(heading, fg=0x00FF00, bold=True))
+
+    print(stylize(heading + ":", fg=0x00FF00, bold=True))
 
     self.stop_event = threading.Event()
     thread = threading.Thread(target=self.spinner)
@@ -271,9 +187,7 @@ class PyGHI:
     if args.type == "prs":
       issues = list(filter(lambda x: x.is_pr, issues))
 
-    output = ""
-    if len(issues) == 0:
-      output = "No results."
+    output = "No results." if len(issues) == 0 else ""
     for issue in issues:
       output += issue.print_line(args.shortlabels, args.nolabels, args.nocomments)
 
@@ -308,19 +222,16 @@ class PyGHI:
     pager(issue.print_detail())
 
   def edit(self, args):
-    payload = {}
-    if args.title:
-      payload["title"] = args.title
-    if args.body:
-      payload["body"] = args.body
-    if args.assignee:
-      payload["assignee"] = args.assignee if args.assignee != "none" else ""
-    if args.state:
-      payload["state"] = args.state
-    if args.milestone:
-      payload["milestone"] = args.milestone
-    if args.labels:
-      payload["labels"] = args.labels
+    payload = {
+      "title": args.title,
+      "body": args.body,
+      "assignee": args.assignee if args.assignee != "none" else "",
+      "state": args.state,
+      "milestone": args.milestone,
+      "labels": args.labels
+    }
+    payload = {k: v for k, v in payload.items() if v != None}
+
     if len(payload) == 0:
       nargs = self.parser.parse_args(["edit", "-h"])
       return nargs.func(nargs)
@@ -376,12 +287,8 @@ class PyGHI:
     return nargs.func(nargs)
 
   def milestone(self, args):
-    if args.state == "all":
-      heading = "All Milestones for %s/%s:" % (self.owner, self.repo)
-    elif args.state == "open":
-      heading = "Open Milestones for %s/%s:" % (self.owner, self.repo)
-    else:
-      heading = "Closed Milestones for %s/%s:" % (self.owner, self.repo)
+    headingstate = args.state[0].upper() + args.state[1:]
+    heading = "%s Milestones for %s/%s:" % (headingstate, self.owner, self.repo)
     print(stylize(heading, fg=0x00FF00, bold=True))
 
     self.stop_event = threading.Event()
