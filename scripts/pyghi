@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import pyghi
+
+pyghi.PyGHI(os.getcwd()).parse_args(sys.argv[1:])

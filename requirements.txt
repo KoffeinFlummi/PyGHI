@@ -1,0 +1,3 @@
+requests>=2.4.0
+xtermcolor>=1.2.1
+colorama>=0.3.2
