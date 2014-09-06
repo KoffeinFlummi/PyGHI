@@ -1,7 +1,7 @@
 PyGHI
 =====
 
-![Build Status](http://img.shields.io/travis/KoffeinFlummi/PyGHI.svg)
+[![Build Status](http://img.shields.io/travis/KoffeinFlummi/PyGHI.svg)](https://travis-ci.org/KoffeinFlummi/PyGHI)
 
 Use your console to access GitHub issues!
 
