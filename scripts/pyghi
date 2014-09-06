@@ -2,6 +2,6 @@
 
 import os
 import sys
-import pyghi
+import pyghi_cli
 
-pyghi.PyGHI(os.getcwd()).parse_args(sys.argv[1:])
+pyghi_cli.PyGHI(os.getcwd()).parse_args(sys.argv[1:])

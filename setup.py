@@ -17,7 +17,7 @@ else:
 setup(
   name = "PyGHI",
   version = "1.0",
-  packages = ["pyghi"],
+  packages = ["pyghi_cli"],
   scripts = ["scripts/pyghi"],
   install_requires = requirements,
 

@@ -60,9 +60,9 @@ def _stylize_windows(text, fg, bg):
 
 def _stylize_unix(text, fg, bg):
     if bg != None:
-        xtermcolor.colorize(text, rgb=fg, bg=bg)
+        return xtermcolor.colorize(text, rgb=fg, bg=bg)
     if fg != None:
-        xtermcolor.colorize(text, rgb=fg)
+        return xtermcolor.colorize(text, rgb=fg)
     return text
 
 # SOURCE:
