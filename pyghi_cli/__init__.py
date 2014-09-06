@@ -61,7 +61,7 @@ class PyGHI:
             ).group(1)
 
             match = re.match(
-                r"https.*?github\.com\/([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)",
+                r".*?github\.com\/([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)",
                 origin
             )
 
