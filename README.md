@@ -11,6 +11,9 @@ https://github.com/stephencelis/ghi
 ![List View](http://i.imgur.com/7e08yuI.png)
 ![Show View](http://i.imgur.com/tjwvYux.png)
 
+Works on both Linux and Windows (at least in the git bash), although not nearly as pretty:
+
+![Ugly Windows](http://i.imgur.com/P2VuXDk.png)
 
 ### Setup
 
