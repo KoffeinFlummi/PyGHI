@@ -5,4 +5,4 @@ python:
   - "3.4"
 
 install: "python setup.py install"
-script: "python test.py False"
+script: "pyghi list"
