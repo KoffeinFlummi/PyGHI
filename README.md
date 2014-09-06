@@ -8,6 +8,9 @@ Use your console to access GitHub issues!
 All credit for the original idea goes to @stephencelis. His repository can be found here:  
 https://github.com/stephencelis/ghi
 
+![List View](http://i.imgur.com/7e08yuI.png)
+![Show View](http://i.imgur.com/tjwvYux.png)
+
 
 ### Setup
 
