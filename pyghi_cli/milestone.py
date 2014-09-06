@@ -14,7 +14,7 @@ class Milestone:
         completed = self.closed_issues
         total = self.closed_issues + self.open_issues
         progressbar = stylize("[", bold=True)
-        percentage = int(round((completed / total) * 100))
+        percentage = int(round((completed / total) * 100)) if total != 0 else 0
 
         stringleft = self.title
         stringright = "%i%s (%i/%i)" % (percentage, "%", completed, total)
@@ -22,7 +22,7 @@ class Milestone:
         stringright = stringright.rjust(int(14))
         string = " %s%s " % (stringleft, stringright)
 
-        pointer = int(30 * completed/total)
+        pointer = int(30 * completed/total) if total != 0 else 0
         filled = stylize(string[:pointer], bg=0x00DD00)
         unfilled = string[pointer:]
 
