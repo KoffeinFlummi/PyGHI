@@ -1,6 +1,8 @@
 PyGHI
 =====
 
+![Build Status](http://img.shields.io/travis/KoffeinFlummi/PyGHI.svg)
+
 Use your console to access GitHub issues!
 
 All credit for the original idea goes to @stephencelis. His repository can be found here:  
