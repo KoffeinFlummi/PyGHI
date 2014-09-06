@@ -142,6 +142,14 @@ class PyGHI:
     cols, rows = get_terminal_size()
     print(" "*cols, end="\r")
 
+  def start_spinner(self):
+    self.stop_event = threading.Event()
+    thread = threading.Thread(target=self.spinner)
+    thread.start()
+
+  def stop_spinner(self):
+    self.stop_event.set()
+
   def list(self, args):
     params = {
       "state": args.state,
@@ -150,38 +158,29 @@ class PyGHI:
       "assignee": args.assignee,
       "creator": args.creator
     }
-    payload = {k: v for k, v in payload.items() if v != None}
+    params = {k: v for k, v in params.items() if v != None}
 
     headingstate = args.state[0].upper() + args.state[1:]
     heading = "%s Issues for %s/%s:" % (headingstate, self.owner, self.repo)
-
-    if "milestone" in params:
-      heading += ", with milestone #%i" % (params["milestone"])
-    if "labels" in params:
-      heading += ", labeled %s" % (params["labels"])
-    if "assignee" in params:
-      heading += ", assigned to %s" % (params["assignee"])
-    if "creator" in params:
-      heading += ", created by %s" % (params["creator"])
-
+    heading += ", with milestone #%i" % (params["milestone"]) if args.milestone else ""
+    heading += ", labeled %s" % (params["labels"]) if args.labels else ""
+    heading += ", assigned to %s" % (params["assignee"]) if args.assignee else ""
+    heading += ", created by %s" % (params["creator"]) if args.creator else ""
     print(stylize(heading + ":", fg=0x00FF00, bold=True))
 
-    self.stop_event = threading.Event()
-    thread = threading.Thread(target=self.spinner)
-    thread.start()
+    self.start_spinner()
 
     url = "repos/%s/%s/issues" % (self.owner, self.repo)
     issues = []
-    params["per_page"] = 100
     for i in range(1,20):
-      params["page"] = i
-      last = self.get_json(url, params)
+      last = self.get_json(url, {"per_page": 100, "page": i})
       if len(last) == 0:
         break
       issues += last
-    self.stop_event.set()
-    issues = list(map(lambda x: Issue(self, x), issues))
 
+    self.stop_spinner()
+
+    issues = list(map(lambda x: Issue(self, x), issues))
     if args.type == "issues":
       issues = list(filter(lambda x: not x.is_pr, issues))
     if args.type == "prs":
@@ -207,15 +206,14 @@ class PyGHI:
     heading = "Issue #%i in %s/%s:" % (args.issueid, self.owner, self.repo)
     print(stylize(heading, fg=0x00FF00, bold=True))
 
-    self.stop_event = threading.Event()
-    thread = threading.Thread(target=self.spinner)
-    thread.start()
+    self.start_spinner()
 
     url = "repos/%s/%s/issues/%i" % (self.owner, self.repo, args.issueid)
     issue = self.get_json(url, {})
     url += "/comments"
     comments = self.get_json(url, {})
-    self.stop_event.set()
+
+    self.stop_spinner()
 
     issue = Issue(self, issue, comments)
 
@@ -236,13 +234,12 @@ class PyGHI:
       nargs = self.parser.parse_args(["edit", "-h"])
       return nargs.func(nargs)
 
-    self.stop_event = threading.Event()
-    thread = threading.Thread(target=self.spinner)
-    thread.start()
+    self.start_spinner()
 
     url = "repos/%s/%s/issues/%i" % (self.owner, self.repo, args.issueid)
     self.patch_json(url, payload)
-    self.stop_event.set()
+
+    self.stop_spinner()
 
     nargs = self.parser.parse_args(["show", str(args.issueid)])
     return nargs.func(nargs)
@@ -263,25 +260,23 @@ class PyGHI:
     return nargs.func(nargs)
 
   def create(self, args):
-    self.stop_event = threading.Event()
-    thread = threading.Thread(target=self.spinner)
-    thread.start()
+    self.start_spinner()
 
     url = "repos/%s/%s/issues" % (self.owner, self.repo)
     result = Issue(self, self.post_json(url, {"title": args.title, "body": args.body}))
-    self.stop_event.set()
+
+    self.stop_spinner()
 
     nargs = self.parser.parse_args(["show", str(result.number)])
     return nargs.func(nargs)
 
   def comment(self, args):
-    self.stop_event = threading.Event()
-    thread = threading.Thread(target=self.spinner)
-    thread.start()
+    self.start_spinner()
 
     url = "repos/%s/%s/issues/%i/comments" % (self.owner, self.repo, args.issueid)
     self.post_json(url, {"body": args.comment})
-    self.stop_event.set()
+
+    self.stop_spinner()
 
     nargs = self.parser.parse_args(["show", str(args.issueid)])
     return nargs.func(nargs)
@@ -291,14 +286,13 @@ class PyGHI:
     heading = "%s Milestones for %s/%s:" % (headingstate, self.owner, self.repo)
     print(stylize(heading, fg=0x00FF00, bold=True))
 
-    self.stop_event = threading.Event()
-    thread = threading.Thread(target=self.spinner)
-    thread.start()
+    self.start_spinner()
 
     url = "repos/%s/%s/milestones" % (self.owner, self.repo)
     milestones = self.get_json(url, {"state": args.state, "per_page": 100})
     milestones = list(map(lambda x: Milestone(self, x), milestones))
-    self.stop_event.set()
+
+    self.stop_spinner()
 
     output = ""
     if len(milestones) == 0:

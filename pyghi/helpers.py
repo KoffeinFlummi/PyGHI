@@ -42,16 +42,25 @@ def stylize(text, fg=None, bg=None, bold=False):
     fg = 0x000000 if brightness > 0.5 else 0xFFFFFF
 
   if platform.system() == "Windows":
-    if fg != None:
-      fg_ansi, fg_reset = _rgb_to_ansi(fg)
-      if bg != None:
-        bg_ansi, bg_reset = _rgb_to_ansi(bg, True)
-        return bg_ansi + fg_ansi + text + fg_reset + bg_reset
-      return fg_ansi + text + fg_reset
+    return _stylize_windows(text, fg, bg)
   else:
-    args = {"rgb": fg, "bg": bg} if bg != None else {"rgb": fg}
-    return xtermcolor.colorize(text, **args)
+    return _stylize_unix(text, fg, bg)
 
+def _stylize_windows(text, fg, bg):
+  if fg != None:
+    fg_ansi, fg_reset = _rgb_to_ansi(fg)
+    if bg != None:
+      bg_ansi, bg_reset = _rgb_to_ansi(bg, True)
+      return bg_ansi + fg_ansi + text + fg_reset + bg_reset
+    return fg_ansi + text + fg_reset
+
+  return text
+
+def _stylize_unix(text, fg, bg):
+  if bg != None:
+    xtermcolor.colorize(text, rgb=fg, bg=bg)
+  if fg != None:
+    xtermcolor.colorize(text, rgb=fg)
   return text
 
 # SOURCE: https://mail.python.org/pipermail/python-list/2008-December/482381.html

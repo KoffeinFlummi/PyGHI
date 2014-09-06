@@ -14,6 +14,11 @@ class Issue:
     for key in data.keys():
       setattr(self, key, data[key])
 
+    if self.body == None:
+      self.body = ""
+    if self.body == "":
+      self.body = "No description provided."
+
     self.user = User(self.master, self.user)
     if self.assignee != None:
       self.assignee = User(self.master, self.assignee)
@@ -36,15 +41,12 @@ class Issue:
     name = self.title + " "
     
     labels = ""
-    if not nolabels:
-      if shortlabels:
-        labels = " ".join(list(map(lambda x: stylize(" ", bg=int(x.color, 16)), self.labels))) + " "
-      else:
-        labels = " ".join(list(map(lambda x: x.print_name(), self.labels))) + " "
+    if shortlabels:
+      labels = " ".join(list(map(lambda x: stylize(" ", bg=int(x.color, 16)), self.labels))) + " "
+    elif not nolabels:
+      labels = " ".join(list(map(lambda x: x.print_name(), self.labels))) + " "
 
-    comments = ""
-    if not nocomments:
-      comments = "[%i %s]" % (len(self.comments), stylize("@", fg=0xFFFF00))
+    comments = "[%i %s]" % (len(self.comments), stylize("@", fg=0xFFFF00)) if nocomments else ""
 
     return "%s%s%s%s%s%s\n" % (number, state, issuetype, name, labels, comments)
 
@@ -65,12 +67,7 @@ class Issue:
       labels = "No labels"
     output += labels + "\n\n"
 
-    if self.body == None:
-      self.body = ""
-    if len(self.body) > 0:
-      output += padding(self.body) + "\n"
-    else:
-      output += padding("No description provided.") + "\n"
+    output += padding(self.body) + "\n"
 
     output += "\n" + stylize("%i %s" % (len(self.comments), "COMMENT" if len(self.comments) == 1 else "COMMENTS"), bold=True) + "\n"
 
