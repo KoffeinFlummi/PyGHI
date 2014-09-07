@@ -1,7 +1,7 @@
 PyGHI
 =====
 
-[![Build Status](http://img.shields.io/travis/KoffeinFlummi/PyGHI.svg)](https://travis-ci.org/KoffeinFlummi/PyGHI) ![License](http://img.shields.io/badge/license-MIT-red.svg)
+[![Build Status](http://img.shields.io/travis/KoffeinFlummi/PyGHI.svg?style=flat-square)](https://travis-ci.org/KoffeinFlummi/PyGHI) [![License](http://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](https://github.com/KoffeinFlummi/PyGHI/blob/master/LICENSE)
 
 Use your console to access GitHub issues!
 
