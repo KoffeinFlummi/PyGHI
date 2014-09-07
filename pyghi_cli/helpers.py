@@ -138,19 +138,21 @@ def relative_time(timestring):
     timeob = datetime.datetime.strptime(timestring, "%Y-%m-%dT%H:%M:%SZ")
     diff = datetime.datetime.utcnow() - timeob
 
-    minutes = int(diff.seconds / 60)
+    seconds = diff.seconds
+    minutes = int(seconds / 60)
     hours = int(minutes / 60)
+    days = diff.days
 
-    if diff.days > 30:
+    if days > 30:
         return timeob.strftime("on %Y-%m-%d")
-    if diff.days > 0:
-        return "%i %s ago" % (diff.days, "day" if diff.days == 1 else "days")
+    if days > 0:
+        return "%i %s ago" % (days, "day" if days == 1 else "days")
     if hours > 0:
         return "%i %s ago" % (hours, "hour" if hours == 1 else "hours")
     if minutes > 0:
         return "%i %s ago" % (minutes, "minute" if minutes == 1 else "minutes")
-    if diff.seconds > 10:
-        return "%i %s ago" % (diff.seconds, "second" if diff.seconds == 1 else "seconds")
+    if seconds > 10:
+        return "%i %s ago" % (seconds, "second" if seconds == 1 else "seconds")
 
     return "just now"
 
@@ -209,8 +211,10 @@ def _get_terminal_size_linux():
         try:
             import fcntl
             import termios
-            cr = struct.unpack('hh',
-                                 fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+            cr = struct.unpack(
+                'hh',
+                fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234')
+            )
             return cr
         except:
             pass

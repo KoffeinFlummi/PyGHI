@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Module containing the classes needed for the PyGHI CLI
+"""
+
 import os
 import sys
 import time
@@ -140,7 +144,7 @@ class PyGHI:
             stylize("ERROR:", fg=0xFF0000, bold=True)
         ]
         print(prefixes[level], message)
-        
+
         if level == 2:
             try:
                 self.stop_event.set()
@@ -164,7 +168,7 @@ class PyGHI:
             print("".join(output), end="\r")
             i = (i+1) % 5
             time.sleep(0.1)
-        
+
         # Clear line
         cols, rows = get_terminal_size()
         print(" "*cols, end="\r")
@@ -210,7 +214,7 @@ class PyGHI:
 
         url = "repos/%s/%s/issues" % (self.owner, self.repo)
         issues = []
-        for i in range(1,20):
+        for i in range(1, 20):
             params["page"] = i
             last = self.get_json(url, params)
             if len(last) == 0:
