@@ -237,7 +237,7 @@ class PyGHI:
 
     def show(self, args):
         if args.browser:
-            out = os.dup(1)
+            savout = os.dup(1)
             os.close(1)
             os.open(os.devnull, os.O_RDWR)
             try:
