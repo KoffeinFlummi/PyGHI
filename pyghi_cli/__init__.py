@@ -183,7 +183,8 @@ class PyGHI:
             "milestone": args.milestone,
             "labels": args.labels,
             "assignee": args.assignee,
-            "creator": args.creator
+            "creator": args.creator,
+            "per_page": 100
         }
         params = {k: v for k, v in params.items() if v != None}
 
@@ -210,7 +211,8 @@ class PyGHI:
         url = "repos/%s/%s/issues" % (self.owner, self.repo)
         issues = []
         for i in range(1,20):
-            last = self.get_json(url, {"per_page": 100, "page": i})
+            params["page"] = i
+            last = self.get_json(url, params)
             if len(last) == 0:
                 break
             issues += last
