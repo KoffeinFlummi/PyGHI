@@ -50,12 +50,23 @@ class PyGHI:
                 self.log(1, "Couldn't parse config file.")
 
         # Check for git repo
-        if not os.path.isdir(os.path.join(self.cwd, ".git")):
+        gitpath = None
+        try:
+            curpath = self.cwd
+            for i in range(20): # maximum depth
+                if os.path.isdir(os.path.join(curpath, ".git")):
+                    gitpath = os.path.join(curpath, ".git")
+                    break
+                if curpath == os.path.dirname(curpath): # reached root
+                    break
+                curpath = os.path.dirname(curpath)
+            assert(curpath != None)
+        except:
             self.log(2, "Current directory is no git repo.")
 
         # Get repository data
         try:
-            gitconfigpath = os.path.join(self.cwd, ".git", "config")
+            gitconfigpath = os.path.join(gitpath, "config")
             gitconfig = open(gitconfigpath, "r").read()
 
             origin = re.match(
