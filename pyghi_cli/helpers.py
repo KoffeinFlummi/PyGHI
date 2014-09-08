@@ -124,7 +124,7 @@ def padding(text, width=2):
                 nextlen = len(" ".join(printwords)) + len(word) + 1
                 if len(printwords) > 0 and nextlen > cols - width*2:
                     result += " "*width + " ".join(printwords) + "\n"
-                    printwords = []
+                    printwords = [word]
                 else:
                     printwords.append(word)
             if len(printwords) > 0:
