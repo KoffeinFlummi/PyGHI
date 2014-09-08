@@ -193,7 +193,7 @@ class PyGHI:
         params = {k: v for k, v in params.items() if v != None}
 
         statestr = args.state[0].upper() + args.state[1:]
-        heading = "%s Issues for %s/%s:" % (
+        heading = "%s Issues for %s/%s" % (
             statestr,
             self.owner,
             self.repo
