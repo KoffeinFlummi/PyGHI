@@ -37,10 +37,7 @@ class PyGHI:
         self.stopwords = stopwords()
 
         # Load config
-        if platform.system() == "Windows":
-            configpath = os.path.join(os.environ["HOMEPATH"], ".pyghiconf")
-        else:
-            configpath = os.path.join(os.environ["HOME"], ".pyghiconf")
+        configpath = os.path.join(os.path.expanduser("~"), ".pyghiconf")
 
         self.config = {}
         if os.path.exists(configpath):
