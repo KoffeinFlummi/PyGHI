@@ -20,8 +20,6 @@ def pager(text):
     while text[-1] == "\n":
         text = text[:-1]
 
-    text = "jashlkajhsdlaksjda ... " + text
-
     try:
       import pymoji
       text = pymoji.replaceAliases(text, 1)
